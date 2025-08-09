@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Infowave</title>
+  <style>
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background-color: #f8f9fa;
+      color: #202122;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      display:flex;
+      text-align: center;
+      padding: 30px 10px 10px 10px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #ccc;
+    }
+    .header img {
+      margin-left:50px;
+      width: 60px;
+      vertical-align: middle;
+    }
+    .header h1 {
+      font-size: 2.2em;
+      margin: 10px 0 5px 0;
+      font-weight: normal;
+    }
+    p {
+      font-size: 1.1em;
+      color: #555;
+      margin-left: 10px;
+    }
+    .search {
+      text-align: center;
+      margin-left: 1px;
+      position: relative; /* Suggestions साठी आवश्यक */
+    }
+    input[type="text"] {
+      width:250px;
+      padding: 10px 2px;
+      font-size: 1em;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      outline:none;
+    }
+    .search input[type="text"]:focus {
+      box-shadow: 0  0 5px rgba(66, 133, 244, 0.5);
+      border-color: #4285f4;
+    }
+    .search button {
+      padding: 10px 10px;
+      font-size: 1em;
+      background-color: #3366cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .search button:hover {
+      background-color: #254a99;
+    }
+    .category {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .category div {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
+    }
+    .category div:hover {
+      transform: scale(1.02);
+    }
+    .category h4 {
+      margin: 0 0 5px 0;
+      font-size: 1.1em;
+    }
+    .category a {
+      text-decoration: none;
+      color: #3366cc;
+    }
+    .category a:hover {
+      text-decoration: underline;
+    }
+    .total {
+      text-align: center;
+      font-size: 1.1em;
+      padding: 20px;
+    }
+    hr {
+      border: none;
+      height: 1px;
+      background-color: #ccc;
+      margin: 20px 0;
+    }
+    .maker {
+      background-color: #f1f1f1;
+      text-align: center;
+      padding: 15px;
+      font-size: 0.95em;
+      color: #555;
+    }
+    #suggestions {
+      width: 60.5%; /* Input पेक्षा थोडे रुंद */
+      margin: 1px auto 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      text-align: left;
+      display: none; /* सुरुवातीला लपलेले */
+    }
+    #suggestions div {
+      padding: 10px;
+      cursor: pointer;
+    }
+    #suggestions div:hover {
+      background-color: #f1f1f1;
+    }
+    
+    /* --- नवीन Search Results Screen साठी CSS --- */
+    #searchResultsScreen {
+        display: none; /* सुरुवातीला ही स्क्रीन लपलेली असेल */
+    }
+    #searchResultsScreen .container {
+        max-width: 800px;
+        margin: 40px auto;
+        background-color: #fff;
+        padding: 20px 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #searchResultsScreen h1 {
+        font-size: 2em;
+        border-bottom: 2px solid #3366cc;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    #searchResultsScreen .result-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    #searchResultsScreen .result-item:last-child {
+        border-bottom: none;
+    }
+    #searchResultsScreen .result-item a {
+        text-decoration: none;
+        color: #3366cc;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    #searchResultsScreen .result-item a:hover {
+        text-decoration: underline;
+    }
+    #searchResultsScreen .no-results {
+        color: #555;
+        font-style: italic;
+        padding: 20px;
+        text-align: center;
+    }
+    #searchResultsScreen .back-button {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 10px 20px;
+        background-color: #3366cc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+    #searchResultsScreen .back-button:hover {
+        background-color: #254a99;
+    }
+    
+    @media (max-width: 600px) {
+      .search input[type="text"] {
+        width: 65%; /* मोबाईलसाठी रुंदी वाढवली */
+      }
+      #suggestions {
+        width: 82%; /* मोबाईलसाठी रुंदी वाढवली */
+      }
+      .category {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+    <!-- 1. मुख्य कंटेंटसाठी एक Wrapper Div -->
+    <div id="mainContent">
+      <!--header & logo-->
+      <div class="header">
+        <img src="logo.png" alt="Logo">
+        <h1>Infowave</h1>
+      </div>
+      <p>A new knowledge platform...</p>
+      
+      <!--Searchbar-->
+      <div class="search">
+        <input type="text" placeholder="Search article..." id="searchInput">
+        <button onclick="searchNow()">Search</button>
+        <div id="suggestions"></div>
+      </div>
+      
+      <!--Categories-->
+      <div class="category">
+        <div class="science">
+          <h4><a href="science.html">Science</a></h4>
+          50+ Articles
+        </div>
+        <div class="Geography">
+          <h4><a href="geography.html">Geography</a></h4>
+          100+ Articles
+        </div>
+        <div class="History">
+          <h4><a href="history.html">History</a></h4>
+          20+ Articles
+        </div>
+        <div class="Biography">
+          <h4><a href="biography.html">Biographies</a></h4>
+          100+ Articles
+        </div>
+      </div>
+      <hr>
+      
+      <!--Total Articles-->
+      <div class="total">
+        <b>Over 500+ articles and growing...</b>
+      </div>
+      <hr>
+      
+      <!--footer-->
+      <div class="maker">
+          <p>Infowave is a project inspired by free knowledge. This site is currently available in English only. ©Infowave</p>
+      </div>
+    </div> <!-- #mainContent Div इथे बंद होतो -->
+
+    <!-- 2. नवीन Search Results Screen (सुरुवातीला लपलेली) -->
+    <div id="searchResultsScreen">
+        <div class="container">
+            <h1>Search Results for "<span id="query-text"></span>"</h1>
+            <div id="results-container">
+                <!-- निकाल इथे JavaScript द्वारे भरले जातील -->
+            </div>
+            <button onclick="goBack()" class="back-button">&larr; Back to Home</button>
+        </div>
+    </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+  <script src="brain.js"></script>
+
+</body>
+</html>
